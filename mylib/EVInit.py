@@ -10,10 +10,9 @@ class EVInit:
 
     def __init__(self):
         self.local = os.path.normcase(os.path.abspath('.'))  # 项目相对路径
-        self.host = "23.110.211.170"  # 服务器host
+        self.host = "104.243.129.90"  # 服务器host
         self.root = "root"  # 账号
-        self.password = "Gchao@888"  # 密码
-        self.remote_path = '/www/wwwroot/xbw/'  # 远程提交路径
+        self.password = "free0827"  # 密码
         self.local_path = self.local + '/down/'  # 本地上传路径
 
     def judge_environmental(self):
@@ -31,7 +30,7 @@ class EVInit:
     def ssh_login(self):
         print('正在连接SSH服务器')
         while True:
-            transport = paramiko.Transport((self.host, 223))
+            transport = paramiko.Transport((self.host, 22))
             try:
                 transport.connect(username=self.root, password=self.password)
                 sftp = paramiko.SFTPClient.from_transport(transport)

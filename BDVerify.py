@@ -27,9 +27,9 @@ class BDVerify:
         # 项目相对路径
         self.local = os.path.normcase(os.path.abspath('.'))
         # 本地上传路径
-        self.upload_path = self.local + '/down/'
+        self.upload_path = 'C:/Users/Administrator/Desktop/BDVerify_x86/down/'
         # 远程上传路径
-        self.remote_path = '/www/wwwroot/xbw/'
+        self.remote_path = '/home/wwwroot/SpiderPool/public/'
         print('uid: %s' % self.uid)
 
     def add_url(self, url):
@@ -104,11 +104,11 @@ class BDVerify:
         rangle = (int(location['x']), int(location['y']), int(location['x'] + size['width']), int(location['y'] + size['height']))
         # 通过Image处理图像
         im = Image.open('screen.png')
-        im = im.crop(rangle)
-        # if code_type == 'add_url':
-        #     im = im.crop((790, 790, 1000, 860))
+        if code_type == 'add_sitemap':
+            rangle = (220, 343, 341, 386)
         # else:
-        #     im = im.crop((745, 690, 965, 780))
+        #     im = im.crop((790, 790, 1000, 860))
+        im = im.crop(rangle)
         im.save('code.png')
         # 查询余额
         balance = self.yundama.balance()
@@ -128,9 +128,10 @@ class BDVerify:
             if os.path.exists(my_file):
                 print('删除多余文件 %s' % filename[0])
                 os.remove(self.upload_path + filename[0])
-        except IndexError:
-            pass
-        time.sleep(1)
+        except Exception as e:
+            print(e)
+        print('----')
+        time.sleep(2)
         WebDriverWait(self.driver, 5).until(EC.visibility_of(self.driver.find_element_by_xpath('//*[@id="file"]/p[2]/a')))
         self.driver.find_element_by_xpath("//dd[@id='file']/p[2]/a[1]").click()
         while True:
@@ -142,7 +143,7 @@ class BDVerify:
                     print('已找到下载文件' + name)
                     time.sleep(0.5)
                     break
-            except (IndexError, ):
+            except:
                 continue
         print('上传本地文件')
         while True:
@@ -165,7 +166,7 @@ class BDVerify:
             files = self.sftp.listdir(self.remote_path)
             for name in files:
                 if str(name) == str(filename[0]):
-                    print(name.strip('\n') + '  对比文件  ' + filename[0])
+                    print('对比成功！')
                     state = False
                     break
             print('等待上传...')
@@ -230,6 +231,18 @@ if __name__ == '__main__':
                  '金融', '社交网络平台', '音乐', '机动车', '生产制造',
                  '政策法规', '综合门户', '历史军事','母婴', '招商联盟',
                  '旅游', '民生', '体育运动', '其它']
+#     for x in range(1, num + 1):
+#         domain = linecache.getline('domain.txt', x)
+#         item = linecache.getline('item.txt', x).split(' ')
+#         print('当前运行至第 %s 行 域名为 http://www.%s' % (x, domain))
+#         temp_num = x - 1
+#         print('领域设置为 %s %s %s' % (item_list[int(item[0])], item_list[int(item[1])], item_list[int(item[2])]))
+#         result = BD.add_url(domain)
+#         print(result)
+#         if result:
+#             BD.set_item([9, 17, 24])
+#             BD.file_verify()
+#             BD.add_sitemap(domain)
     try:
         for x in range(1, num + 1):
             domain = linecache.getline('domain.txt', x)
@@ -263,4 +276,3 @@ if __name__ == '__main__':
                 num += 1
         print(e)
         BD.driver.close()
-
