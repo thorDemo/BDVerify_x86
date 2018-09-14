@@ -12,7 +12,7 @@ class EVInit:
         self.local = os.path.normcase(os.path.abspath('.'))  # 项目相对路径
         self.host = "104.243.129.90"  # 服务器host
         self.root = "root"  # 账号
-        self.password = "free0827"  # 密码
+        self.password = "Gchao@888"  # 密码
         self.local_path = self.local + '/down/'  # 本地上传路径
 
     def judge_environmental(self):

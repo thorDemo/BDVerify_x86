@@ -27,7 +27,7 @@ class BDVerify:
         # 项目相对路径
         self.local = os.path.normcase(os.path.abspath('.'))
         # 本地上传路径
-        self.upload_path = 'C:/Users/Administrator/Desktop/BDVerify_x86/down/'
+        self.upload_path = 'C:/Users/Administrator/Desktop/MyProject/BDVerify_x86/down/'
         # 远程上传路径
         self.remote_path = '/home/wwwroot/SpiderPool/public/'
         print('uid: %s' % self.uid)
@@ -43,6 +43,7 @@ class BDVerify:
         while True:
             try:
                 self.driver.find_element_by_id('captcha-img').click()
+                time.sleep(1)
                 WebDriverWait(self.driver, 10).until(EC.visibility_of(self.driver.find_element_by_class_name('ml5')))
                 time.sleep(2.5)
                 code = self.get_code('add_url')
@@ -153,7 +154,8 @@ class BDVerify:
                 time.sleep(2)
                 print("上传文件成功 path: " + self.remote_path + filename[0])
                 break
-            except Exception:
+            except Exception as e:
+                print(e)
                 print("连接失败！ 再次重试上传")
                 print("loading...")
                 time.sleep(3)
@@ -197,11 +199,16 @@ class BDVerify:
             select = self.driver.find_element_by_id("urls")
             select.click()
             select.send_keys('www.%s/sitemap.xml' % url.strip('\n'))
+            self.driver.find_element_by_id('captcha-img').click()
+            time.sleep(1)
+            self.driver.find_element_by_id('captcha-img').click()
+            time.sleep(1)
             select = self.driver.find_element_by_xpath("//*[@id='captcha-img']/span")
             select.click()
             WebDriverWait(self.driver, 4).until(EC.visibility_of(self.driver.find_element_by_class_name('ml5')))
             while True:
                 try:
+                    time.sleep(1)
                     verify = self.get_code('add_sitemap')
                     select = self.driver.find_element_by_id("captcha")
                     select.send_keys(verify)
@@ -221,7 +228,7 @@ class BDVerify:
             print('已经存在sitemap.xml')
 
 
-if __name__ == '__main__':
+def main():
     BD = BDVerify()
     num = len(linecache.getlines('domain.txt'))
     temp_num = 0
@@ -231,22 +238,13 @@ if __name__ == '__main__':
                  '金融', '社交网络平台', '音乐', '机动车', '生产制造',
                  '政策法规', '综合门户', '历史军事','母婴', '招商联盟',
                  '旅游', '民生', '体育运动', '其它']
-#     for x in range(1, num + 1):
-#         domain = linecache.getline('domain.txt', x)
-#         item = linecache.getline('item.txt', x).split(' ')
-#         print('当前运行至第 %s 行 域名为 http://www.%s' % (x, domain))
-#         temp_num = x - 1
-#         print('领域设置为 %s %s %s' % (item_list[int(item[0])], item_list[int(item[1])], item_list[int(item[2])]))
-#         result = BD.add_url(domain)
-#         print(result)
-#         if result:
-#             BD.set_item([9, 17, 24])
-#             BD.file_verify()
-#             BD.add_sitemap(domain)
+
+    last_url = ''
     try:
         for x in range(1, num + 1):
             domain = linecache.getline('domain.txt', x)
             item = linecache.getline('item.txt', x).split(' ')
+            last_url = domain
             print('当前运行至第 %s 行 域名为 http://www.%s' % (x, domain))
             temp_num = x - 1
             print('领域设置为 %s %s %s' % (item_list[int(item[0])], item_list[int(item[1])], item_list[int(item[2])]))
@@ -256,7 +254,7 @@ if __name__ == '__main__':
                 BD.set_item([9, 17, 24])
                 BD.file_verify()
                 BD.add_sitemap(domain)
-    except Exception as e:
+    finally:
         print('删除已经成功添加的域名 %s 行 ' % temp_num)
         with open("domain.txt", "r") as f:
             lines = f.readlines()
@@ -274,5 +272,11 @@ if __name__ == '__main__':
                 if num >= temp_num:
                     f.write(line)
                 num += 1
-        print(e)
-        BD.driver.close()
+        # BD.driver.close()
+        if not last_url:
+            main()
+
+
+if __name__ == '__main__':
+    main()
+
